@@ -1,0 +1,50 @@
+# More documentation about how to customize your build
+# can be found here:
+# https://docs.fastlane.tools
+fastlane_version "2.68.0"
+# Fastfile actions accept additional configuration, but
+# don't worry, fastlane will prompt you for required
+platform :ios do
+lane :beta do
+ensure_git_branch(
+branch: "master"
+)
+git_pull
+
+increment_build_number(
+xcodeproj: "./ios/fastlaneSample.xcodeproj"
+)
+
+get_certificates
+get_provisioning_profile(
+app_identifier: "com.fastlanesample.app"
+)
+
+# build your iOS app
+build_ios_app(
+project: "./ios/fastlaneSample.xcodeproj",
+scheme: "yourProjectRelease",
+export_method: "app-store"
+)
+
+# TestFlight
+pilot()
+end
+end
+
+platform :android do
+lane :beta do
+ensure_git_branch(
+branch: "master"
+)
+git_pull
+
+# build the release variant
+gradle(task: "clean", project_dir: "android/")
+gradle(task: "assemble", build_type: "Release", project_dir: "android/")
+# upload to HockeyApp
+hockey(
+api_token: "42956b84be51470cbfae612ef2ccbb3d"
+)
+end
+end
